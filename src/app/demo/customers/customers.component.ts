@@ -5,6 +5,7 @@ import { CreateCustomerModel } from 'src/app/model/customer/create-customer.mode
 import { UpdateCustomerModel } from 'src/app/model/customer/update-customer.model';
 import { Toast } from 'bootstrap';
 import { SharedModule } from 'src/app/theme/shared/shared.module';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-customer',
@@ -18,7 +19,7 @@ export class CustomersComponent implements OnInit {
   newCustomer: CreateCustomerModel = { firstName: '', lastName: '', email: '', phoneNumber: '' };
   selectedCustomer: UpdateCustomerModel | null = null;
 
-  constructor(private customerService: CustomerService) {}
+  constructor(private customerService: CustomerService) { }
 
   ngOnInit(): void {
     this.loadCustomers();
@@ -35,7 +36,7 @@ export class CustomersComponent implements OnInit {
       }
     );
   }
-  
+
 
   showToast(message: string, title: string = 'Notification') {
     const toastTitle = document.getElementById('toastTitle')!;
@@ -81,16 +82,41 @@ export class CustomersComponent implements OnInit {
     }
   }
 
-  deleteCustomer(customerId: number): void {
-    this.customerService.deleteCustomer(customerId).subscribe(
-      () => {
-        this.customers = this.customers.filter(c => c.customerID !== customerId);
-        this.showToast('Müşteri başarıyla silindi.', 'Başarılı');
-      },
-      (error) => {
-        this.showToast('Müşteri silinirken hata oluştu.', 'Hata');
+  confirmDelete(customer: CustomerModel): void {
+    Swal.fire({
+      title: 'Emin misiniz?',
+      text: `${customer.firstName} ${customer.lastName} adlı müşteriyi silmek istediğinizden emin misiniz?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Evet, sil!',
+      cancelButtonText: 'Hayır, iptal et',
+      customClass: {
+        confirmButton: 'btn btn-danger btn-sm',
+        cancelButton: 'btn btn-secondary btn-sm'
       }
-    );
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.customerService.deleteCustomer(customer.customerID).subscribe(
+          () => {
+            this.customers = this.customers.filter(c => c.customerID !== customer.customerID);
+            Swal.fire(
+              'Hata!',
+              'Kullanıcıya ait kayıt silinemiyor.',
+              'error'
+            );
+          },
+          (error) => {
+            Swal.fire(
+              'Başarılı!',
+              'Kullanıcı başarıyla silindi.',
+              'success'
+            );
+          }
+        );
+      }
+    });
   }
 
   openUpdateModal(customer: CustomerModel): void {
