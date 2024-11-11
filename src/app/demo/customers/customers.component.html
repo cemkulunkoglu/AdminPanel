@@ -1,0 +1,169 @@
+<div class="row">
+  <div class="d-flex justify-content-between mb-2">
+    <h2 class="mt-2">Kullanıcılar</h2>
+    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+      Yeni Kullanıcı Ekle
+    </button>
+  </div>
+  <hr />
+  <div>
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th scope="col"></th>
+          <th scope="col">Ad</th>
+          <th scope="col">Soyad</th>
+          <th scope="col">Email</th>
+          <th scope="col">Telefon Numarası</th>
+          <th scope="col">İşlemler</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let customer of customers; let i = index">
+          <th scope="row">{{ i + 1 }}</th>
+          <td>{{ customer.firstName }}</td>
+          <td>{{ customer.lastName }}</td>
+          <td>{{ customer.email }}</td>
+          <td>{{ customer.phoneNumber }}</td>
+          <td>
+            <button
+              type="button"
+              class="btn btn-sm btn-warning me-1"
+              (click)="openUpdateModal(customer)"
+              data-bs-toggle="modal"
+              data-bs-target="#updateCustomerModal"
+            >
+              <i class="ti ti-edit"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-danger"><i class="ti ti-trash"></i></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Yeni Kullanıcı Ekle Modal -->
+<div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addCustomerModalLabel">Yeni Kullanıcı Ekle</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form #customerForm="ngForm">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="first-name" class="col-form-label">Ad</label>
+                <input type="text" class="form-control" id="first-name" [(ngModel)]="newCustomer.firstName" name="firstName" required />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="last-name" class="col-form-label">Soyad</label>
+                <input type="text" class="form-control" id="last-name" [(ngModel)]="newCustomer.lastName" name="lastName" required />
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="mb-3">
+                <label for="email" class="col-form-label">Email</label>
+                <input type="email" class="form-control" id="email" [(ngModel)]="newCustomer.email" name="email" required />
+              </div>
+              <div class="mb-3">
+                <label for="phone-number" class="col-form-label">Telefon Numarası</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="phone-number"
+                  [(ngModel)]="newCustomer.phoneNumber"
+                  name="phoneNumber"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-dismiss="modal">Kapat</button>
+        <button type="button" class="btn btn-sm btn-success" (click)="addCustomer()">Ekle</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Güncelleme Modalı -->
+<div class="modal fade" id="updateCustomerModal" tabindex="-1" aria-labelledby="updateCustomerModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="updateCustomerModalLabel">Kullanıcıyı Güncelle</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedCustomer">
+        <form #updateCustomerForm="ngForm">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="update-first-name" class="col-form-label">Ad</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="update-first-name"
+                  [(ngModel)]="selectedCustomer.firstName"
+                  name="firstName"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="update-email" class="col-form-label">Email</label>
+                <input type="email" class="form-control" id="update-email" [(ngModel)]="selectedCustomer.email" name="email" required />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="update-last-name" class="col-form-label">Soyad</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="update-last-name"
+                  [(ngModel)]="selectedCustomer.lastName"
+                  name="lastName"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="update-phone-number" class="col-form-label">Telefon Numarası</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="update-phone-number"
+                  [(ngModel)]="selectedCustomer.phoneNumber"
+                  name="phoneNumber"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Kapat</button>
+        <button type="button" class="btn btn-success" (click)="updateCustomer()" data-bs-dismiss="modal">Güncelle</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toastContainer" aria-live="polite" aria-atomic="true" class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050">
+  <div class="toast" id="operationToast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true">
+    <div class="toast-header">
+      <strong class="me-auto" id="toastTitle">Notification</strong>
+      <small id="toastTime">Şimdi</small>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body" id="toastMessage"></div>
+  </div>
+</div>
