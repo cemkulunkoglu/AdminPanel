@@ -66,7 +66,7 @@ const NavigationItems = [
         type: 'item',
         classes: 'nav-item',
         url: '/orders',
-        icon: 'ti ti-receipt',
+        icon: 'ti ti-basket',
         breadcrumbs: false
       }
     ]

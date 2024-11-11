@@ -16,6 +16,8 @@ import Swal from 'sweetalert2';
 })
 export class CustomersComponent implements OnInit {
   customers: CustomerModel[] = [];
+  filteredCustomers: CustomerModel[] = [];
+  searchTerm: string = '';
   newCustomer: CreateCustomerModel = { firstName: '', lastName: '', email: '', phoneNumber: '' };
   selectedCustomer: UpdateCustomerModel | null = null;
 
@@ -28,8 +30,8 @@ export class CustomersComponent implements OnInit {
   loadCustomers(): void {
     this.customerService.getCustomers().subscribe(
       (data) => {
-        console.log('API yanıtı:', data);
         this.customers = data;
+        this.filteredCustomers = data;
       },
       (error) => {
         console.error('API çağrısında hata oluştu:', error);
@@ -37,6 +39,16 @@ export class CustomersComponent implements OnInit {
     );
   }
 
+  searchCustomer(): void {
+    const terms = this.searchTerm.toLowerCase().split(' ').filter(term => term); 
+    this.filteredCustomers = this.customers.filter(customer => {
+      const fullName = `${customer.firstName} ${customer.lastName}`.toLowerCase();
+      return terms.every(term => 
+        fullName.includes(term) || 
+        customer.email.toLowerCase().includes(term)
+      );
+    });
+  }  
 
   showToast(message: string, title: string = 'Notification') {
     const toastTitle = document.getElementById('toastTitle')!;
@@ -53,6 +65,7 @@ export class CustomersComponent implements OnInit {
     this.customerService.addCustomer(this.newCustomer).subscribe(
       (customer) => {
         this.customers.push(customer);
+        this.filteredCustomers.push(customer);
         this.newCustomer = { firstName: '', lastName: '', email: '', phoneNumber: '' };
         this.showToast('Müşteri başarıyla eklendi.', 'Başarılı');
         const closeModalButton = document.querySelector('#addCustomerModal .btn-close') as HTMLElement;
@@ -71,6 +84,7 @@ export class CustomersComponent implements OnInit {
           const index = this.customers.findIndex(c => c.customerID === updatedCustomer.customerID);
           if (index !== -1) {
             this.customers[index] = updatedCustomer;
+            this.searchCustomer(); // Güncellenen listeyi filtrelemek için aramayı yenileyin
           }
           this.showToast('Müşteri başarıyla güncellendi.', 'Başarılı');
           this.selectedCustomer = null;
@@ -101,18 +115,29 @@ export class CustomersComponent implements OnInit {
         this.customerService.deleteCustomer(customer.customerID).subscribe(
           () => {
             this.customers = this.customers.filter(c => c.customerID !== customer.customerID);
-            Swal.fire(
-              'Hata!',
-              'Kullanıcıya ait kayıt silinemiyor.',
-              'error'
-            );
-          },
-          (error) => {
+            this.filteredCustomers = this.filteredCustomers.filter(c => c.customerID !== customer.customerID);
             Swal.fire(
               'Başarılı!',
-              'Kullanıcı başarıyla silindi.',
+              'Müşteri başarıyla silindi.',
               'success'
-            );
+            ).then(() => {
+              location.reload();
+            });
+          },
+          (error) => {
+            if (error.status === 400) {
+              Swal.fire(
+                'Silme Başarısız',
+                'Bu müşteri silinemiyor çünkü siparişleri bulunmaktadır.',
+                'info'
+              );
+            } else {
+              Swal.fire(
+                'Hata!',
+                'Bir hata oluştu. Lütfen tekrar deneyin.',
+                'error'
+              );
+            }
           }
         );
       }

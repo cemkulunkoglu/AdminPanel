@@ -2,10 +2,20 @@
   <div class="d-flex justify-content-between mb-2">
     <h2 class="mt-2">Kullanıcılar</h2>
     <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
-      Yeni Kullanıcı Ekle
+      <i class="ti ti-user-plus"></i>   Kullanıcı Ekle
     </button>
   </div>
   <hr />
+  <div class="d-flex justify-content-between mb-2">
+    <input
+      class="form-control"
+      type="text"
+      placeholder="Kullanıcı ara"
+      [(ngModel)]="searchTerm"
+      (input)="searchCustomer()"
+      aria-label="default input example"
+    />
+  </div>
   <div>
     <table class="table table-hover">
       <thead>
@@ -19,16 +29,19 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let customer of customers; let i = index">
+        <tr *ngFor="let customer of filteredCustomers; let i = index">
           <th scope="row">{{ i + 1 }}</th>
           <td>{{ customer.firstName }}</td>
           <td>{{ customer.lastName }}</td>
           <td>{{ customer.email }}</td>
           <td>{{ customer.phoneNumber }}</td>
           <td>
+            <button type="button" class="btn btn-sm btn-secondary">
+              <i class="ti ti-search"></i>
+            </button>
             <button
               type="button"
-              class="btn btn-sm btn-warning me-1"
+              class="btn btn-sm btn-warning mx-1"
               (click)="openUpdateModal(customer)"
               data-bs-toggle="modal"
               data-bs-target="#updateCustomerModal"
