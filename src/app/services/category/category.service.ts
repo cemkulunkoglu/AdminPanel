@@ -9,7 +9,7 @@ import { CategoryModel, CreateCategoryModel, UpdateCategoryModel } from 'src/app
 export class CategoryService {
   private apiUrl = 'https://localhost:7263/api/category'; // API URL'si
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // Tüm kategorileri getir
   getCategories(): Observable<CategoryModel[]> {
@@ -18,12 +18,12 @@ export class CategoryService {
 
   // Yeni kategori ekle
   addCategory(category: CreateCategoryModel): Observable<CategoryModel> {
-    return this.http.post<CategoryModel>(`${this.apiUrl}/AddCategory`, category);
+    return this.http.post<CategoryModel>(`${this.apiUrl}/CreateCategory`, category);
   }
 
   // Mevcut bir kategoriyi güncelle
   updateCategory(categoryID: number, category: UpdateCategoryModel): Observable<CategoryModel> {
-    return this.http.put<CategoryModel>(`${this.apiUrl}/UpdateCategory/${categoryID}`, category);
+    return this.http.put<CategoryModel>(`${this.apiUrl}/UpdateCategory`, category);
   }
 
   // Kategoriyi sil

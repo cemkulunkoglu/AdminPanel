@@ -12,22 +12,22 @@
     <!-- Kategoriye Göre Filtreleme -->
     <div class="me-1 w-25">
       <label for="categoryFilter" class="form-label">Kategoriye Göre Filtrele:</label>
-      <select class="form-control" [(ngModel)]="selectedCategoryId" (change)="onCategoryChange()">
-        <option [value]="0">Tüm Kategoriler</option>
-        <option *ngFor="let category of categories" [value]="category.categoryID">{{ category.categoryName }}</option>
+      <select class="form-control" [(ngModel)]="selectedCategoryName" (change)="onCategoryChange()">
+        <option>Tüm Kategoriler</option>
+        <option *ngFor="let category of categories">{{ category.categoryName }}</option>
       </select>
     </div>
     <!-- Ürün Ara -->
     <div class="ms-1 w-75">
       <label for="categoryFilter" class="form-label">Ürün Adı veya Barkoda Göre Filtrele:</label>
       <input
-      class="form-control"
-      type="text"
-      placeholder="Ürün ara"
-      [(ngModel)]="searchTerm"
-      (input)="onSearchTermChange()"
-      aria-label="default input example"
-    />
+        class="form-control"
+        type="text"
+        placeholder="Ürün ara"
+        [(ngModel)]="searchTerm"
+        (input)="onSearchTermChange()"
+        aria-label="default input example"
+      />
     </div>
   </div>
 
@@ -36,12 +36,12 @@
     <table class="table table-hover">
       <thead>
         <tr>
-          <th scope="col">#</th>
+          <th scope="col"></th>
           <th scope="col">Ürün Adı</th>
           <th scope="col">Fiyat</th>
           <th scope="col">Barkod</th>
           <th scope="col">Kategori</th>
-          <th scope="col">İşlemler</th>
+          <th scope="col"></th>
         </tr>
       </thead>
       <tbody>
@@ -51,7 +51,7 @@
           <td>{{ product.unitPrice | currency }}</td>
           <td>{{ product.barcode }}</td>
           <td>{{ getCategoryName(product.categoryID) }}</td>
-          <td>
+          <td class="d-flex justify-content-end">
             <button
               type="button"
               class="btn btn-sm btn-warning mx-1"
@@ -68,5 +68,73 @@
         </tr>
       </tbody>
     </table>
+  </div>
+</div>
+
+<!-- Ürün Ekle Modal -->
+<div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addProductModalLabel">Yeni Ürün Ekle</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="product-name" class="col-form-label">Ürün Adı</label>
+            <input type="text" class="form-control" [(ngModel)]="newProduct.productName" name="productName" required />
+          </div>
+          <div class="mb-3">
+            <label for="unit-price" class="col-form-label">Fiyat</label>
+            <input type="number" class="form-control" [(ngModel)]="newProduct.unitPrice" name="unitPrice" required />
+          </div>
+          <div class="mb-3">
+            <label for="category-id" class="col-form-label">Kategori</label>
+            <select class="form-control" [(ngModel)]="newProduct.categoryID" name="categoryID" required>
+              <option *ngFor="let category of categories" [value]="category.categoryID">{{ category.categoryName }}</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-dismiss="modal">Kapat</button>
+        <button type="button" class="btn btn-sm btn-success" (click)="addProduct()">Ekle</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Ürün Güncelle Modal -->
+<div class="modal fade" id="updateProductModal" tabindex="-1" aria-labelledby="updateProductModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="updateProductModalLabel">Ürünü Güncelle</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedProduct">
+        <form>
+          <div class="mb-3">
+            <label for="update-product-name" class="col-form-label">Ürün Adı</label>
+            <input type="text" class="form-control" [(ngModel)]="selectedProduct.productName" name="productName" required />
+          </div>
+          <div class="mb-3">
+            <label for="update-unit-price" class="col-form-label">Fiyat</label>
+            <input type="number" class="form-control" [(ngModel)]="selectedProduct.unitPrice" name="unitPrice" required />
+          </div>
+          <div class="mb-3">
+            <label for="update-category-id" class="col-form-label">Kategori</label>
+            <select class="form-control" [(ngModel)]="selectedProduct.categoryID" name="categoryID" required>
+              <option *ngFor="let category of categories" [value]="category.categoryID">{{ category.categoryName }}</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Kapat</button>
+        <button type="button" class="btn btn-success" (click)="updateProduct()">Güncelle</button>
+      </div>
+    </div>
   </div>
 </div>

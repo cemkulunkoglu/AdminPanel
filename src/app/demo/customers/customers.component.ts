@@ -3,7 +3,6 @@ import { CustomerService } from '../../services/customer/customer.service';
 import { CustomerModel } from 'src/app/model/customer/customer.model';
 import { CreateCustomerModel } from 'src/app/model/customer/create-customer.model';
 import { UpdateCustomerModel } from 'src/app/model/customer/update-customer.model';
-import { Toast } from 'bootstrap';
 import { SharedModule } from 'src/app/theme/shared/shared.module';
 import Swal from 'sweetalert2';
 
@@ -40,25 +39,14 @@ export class CustomersComponent implements OnInit {
   }
 
   searchCustomer(): void {
-    const terms = this.searchTerm.toLowerCase().split(' ').filter(term => term); 
+    const terms = this.searchTerm.toLowerCase().split(' ').filter(term => term);
     this.filteredCustomers = this.customers.filter(customer => {
       const fullName = `${customer.firstName} ${customer.lastName}`.toLowerCase();
-      return terms.every(term => 
-        fullName.includes(term) || 
+      return terms.every(term =>
+        fullName.includes(term) ||
         customer.email.toLowerCase().includes(term)
       );
     });
-  }  
-
-  showToast(message: string, title: string = 'Notification') {
-    const toastTitle = document.getElementById('toastTitle')!;
-    const toastMessage = document.getElementById('toastMessage')!;
-    toastTitle.innerText = title;
-    toastMessage.innerText = message;
-
-    const toastElement = document.getElementById('operationToast');
-    const toast = new Toast(toastElement!);
-    toast.show();
   }
 
   addCustomer(): void {
@@ -67,12 +55,13 @@ export class CustomersComponent implements OnInit {
         this.customers.push(customer);
         this.filteredCustomers.push(customer);
         this.newCustomer = { firstName: '', lastName: '', email: '', phoneNumber: '' };
-        this.showToast('Müşteri başarıyla eklendi.', 'Başarılı');
+        Swal.fire('Başarılı!', 'Müşteri başarıyla eklendi.', 'success');
         const closeModalButton = document.querySelector('#addCustomerModal .btn-close') as HTMLElement;
-        closeModalButton.click();
+        closeModalButton.click()
+        location.reload();
       },
       (error) => {
-        this.showToast('Müşteri eklenirken hata oluştu.', 'Hata');
+        Swal.fire('Hata!', 'Müşteri eklenirken hata oluştu.', 'error');
       }
     );
   }
@@ -84,13 +73,13 @@ export class CustomersComponent implements OnInit {
           const index = this.customers.findIndex(c => c.customerID === updatedCustomer.customerID);
           if (index !== -1) {
             this.customers[index] = updatedCustomer;
-            this.searchCustomer(); // Güncellenen listeyi filtrelemek için aramayı yenileyin
+            this.searchCustomer();
           }
-          this.showToast('Müşteri başarıyla güncellendi.', 'Başarılı');
-          this.selectedCustomer = null;
+          Swal.fire('Başarılı!', 'Müşteri başarıyla güncellendi.', 'success');
+          this.selectedCustomer = null; 
         },
         (error) => {
-          this.showToast('Müşteri güncellenirken hata oluştu.', 'Hata');
+          Swal.fire('Hata!', 'Müşteri güncellenirken hata oluştu.', 'error');
         }
       );
     }
@@ -117,12 +106,10 @@ export class CustomersComponent implements OnInit {
             this.customers = this.customers.filter(c => c.customerID !== customer.customerID);
             this.filteredCustomers = this.filteredCustomers.filter(c => c.customerID !== customer.customerID);
             Swal.fire(
-              'Başarılı!',
-              'Müşteri başarıyla silindi.',
-              'success'
-            ).then(() => {
-              location.reload();
-            });
+              'Hata!',
+              'Bir hata oluştu. Lütfen tekrar deneyin.',
+              'error'
+            );
           },
           (error) => {
             if (error.status === 400) {
@@ -133,10 +120,12 @@ export class CustomersComponent implements OnInit {
               );
             } else {
               Swal.fire(
-                'Hata!',
-                'Bir hata oluştu. Lütfen tekrar deneyin.',
-                'error'
-              );
+                'Başarılı!',
+                'Müşteri başarıyla silindi.',
+                'success'
+              ).then(() => {
+                location.reload();
+              });
             }
           }
         );

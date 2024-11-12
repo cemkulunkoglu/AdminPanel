@@ -7,6 +7,7 @@ import { ProductModel } from 'src/app/model/product/product.model';
 import { CreateProductModel } from 'src/app/model/product/create-product.model';
 import { UpdateProductModel } from 'src/app/model/product/update-product.model';
 import { CategoryModel } from 'src/app/model/category/category.model';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-products',
@@ -22,12 +23,12 @@ export class ProductsComponent implements OnInit {
   searchTerm: string = '';
   newProduct: CreateProductModel = { productName: '', unitPrice: 0, barcode: '', categoryID: 0 };
   selectedProduct: UpdateProductModel | null = null;
-  selectedCategoryId: number = 0;
+  selectedCategoryName: string = 'Tüm Kategoriler';
 
   constructor(
     private productService: ProductService,
     private categoryService: CategoryService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadProducts();
@@ -64,10 +65,11 @@ export class ProductsComponent implements OnInit {
 
   filterProducts(): void {
     const term = this.searchTerm.toLowerCase();
-    this.filteredProducts = this.products.filter(product =>
-      (this.selectedCategoryId === 0 || product.categoryID === this.selectedCategoryId) &&
-      (`${product.productName} ${product.barcode}`.toLowerCase().includes(term))
-    );
+    this.filteredProducts = this.products.filter(product => {
+      const productCategoryName = this.getCategoryName(product.categoryID);
+      return (this.selectedCategoryName === 'Tüm Kategoriler' || productCategoryName === this.selectedCategoryName) &&
+        (`${product.productName} ${product.barcode}`.toLowerCase().includes(term));
+    });
   }
 
   onCategoryChange(): void {
@@ -79,14 +81,19 @@ export class ProductsComponent implements OnInit {
   }
 
   addProduct(): void {
+    this.newProduct.categoryID = Number(this.newProduct.categoryID);
     this.productService.addProduct(this.newProduct).subscribe(
       (product) => {
         this.products.push(product);
         this.filterProducts();
         this.newProduct = { productName: '', unitPrice: 0, barcode: '', categoryID: 0 };
+        Swal.fire('Başarılı!', 'Ürün başarıyla eklendi.', 'success');
+        const closeModalButton = document.querySelector('#addProductModal .btn-close') as HTMLElement;
+        closeModalButton.click();
+        location.reload();
       },
       (error) => {
-        console.error('Ürün eklenirken hata oluştu:', error);
+        Swal.fire('Hata!', 'Ürün eklenirken bir hata oluştu.', 'error');
       }
     );
   }
@@ -97,7 +104,9 @@ export class ProductsComponent implements OnInit {
 
   updateProduct(): void {
     if (this.selectedProduct) {
-      this.productService.updateProduct(this.selectedProduct.productID, this.selectedProduct).subscribe(
+      this.selectedProduct.categoryID = Number(this.selectedProduct.categoryID);
+
+      this.productService.updateProduct(this.selectedProduct).subscribe(
         (updatedProduct) => {
           const index = this.products.findIndex(p => p.productID === updatedProduct.productID);
           if (index !== -1) {
@@ -105,25 +114,46 @@ export class ProductsComponent implements OnInit {
           }
           this.filterProducts();
           this.selectedProduct = null;
+          Swal.fire('Başarılı!', 'Ürün başarıyla güncellendi.', 'success');
+          const closeModalButton = document.querySelector('#updateProductModal .btn-close') as HTMLElement;
+          closeModalButton.click();
         },
         (error) => {
-          console.error('Ürün güncellenirken hata oluştu:', error);
+          Swal.fire('Hata!', 'Ürün güncellenirken bir hata oluştu.', 'error');
         }
       );
     }
   }
 
   confirmDelete(product: ProductModel): void {
-    if (confirm(`${product.productName} adlı ürünü silmek istediğinize emin misiniz?`)) {
-      this.productService.deleteProduct(product.productID).subscribe(
-        () => {
-          this.products = this.products.filter(p => p.productID !== product.productID);
-          this.filterProducts();
-        },
-        (error) => {
-          console.error('Ürün silinirken hata oluştu:', error);
-        }
-      );
-    }
+    Swal.fire({
+      title: 'Emin misiniz?',
+      text: `${product.productName} adlı ürünü silmek istediğinizden emin misiniz?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Evet, sil!',
+      cancelButtonText: 'Hayır, iptal et',
+      customClass: {
+        confirmButton: 'btn btn-danger btn-sm',
+        cancelButton: 'btn btn-secondary btn-sm'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.productService.deleteProduct(product.productID).subscribe(
+          () => {
+            this.products = this.products.filter(p => p.productID !== product.productID);
+            this.filterProducts();
+            Swal.fire('Hata!', 'Ürün silinirken bir hata oluştu.', 'error');
+          },
+          (error) => {
+            Swal.fire('Başarılı!', 'Ürün başarıyla silindi.', 'success').then(() => {
+              location.reload();
+            });
+          }
+        );
+      }
+    });
   }
 }

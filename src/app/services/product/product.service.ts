@@ -20,13 +20,13 @@ export class ProductService {
 
   // Yeni ürün ekle
   addProduct(product: CreateProductModel): Observable<ProductModel> {
-    return this.http.post<ProductModel>(`${this.apiUrl}/AddProduct`, product);
+    return this.http.post<ProductModel>(`${this.apiUrl}/CreateProduct`, product);
   }
 
   // Mevcut bir ürünü güncelle
-  updateProduct(productId: number, product: UpdateProductModel): Observable<ProductModel> {
-    return this.http.put<ProductModel>(`${this.apiUrl}/UpdateProduct/${productId}`, product);
-  }
+  updateProduct(product: UpdateProductModel): Observable<ProductModel> {
+    return this.http.put<ProductModel>(`${this.apiUrl}/UpdateProduct`, product);
+  }  
 
   // Ürünü ID'ye göre sil
   deleteProduct(productId: number): Observable<string> {
