@@ -2,7 +2,8 @@
   <div class="d-flex justify-content-between mb-2">
     <h2 class="mt-2">Kullanıcılar</h2>
     <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
-      <i class="ti ti-user-plus"></i>   Kullanıcı Ekle
+      <i class="ti ti-user-plus"></i>
+      Kullanıcı Ekle
     </button>
   </div>
   <hr />
@@ -36,7 +37,7 @@
           <td>{{ customer.email }}</td>
           <td>{{ customer.phoneNumber }}</td>
           <td class="d-flex justify-content-end">
-            <button type="button" class="btn btn-sm btn-secondary disabled">
+            <button type="button" class="btn btn-sm btn-secondary disabled" title="İncele">
               <i class="ti ti-search"></i>
             </button>
             <button
@@ -45,10 +46,11 @@
               (click)="openUpdateModal(customer)"
               data-bs-toggle="modal"
               data-bs-target="#updateCustomerModal"
+              title="Düzenle"
             >
               <i class="ti ti-edit"></i>
             </button>
-            <button type="button" class="btn btn-sm btn-danger" (click)="confirmDelete(customer)">
+            <button type="button" class="btn btn-sm btn-danger" (click)="confirmDelete(customer)" title="Sil">
               <i class="ti ti-trash"></i>
             </button>
           </td>

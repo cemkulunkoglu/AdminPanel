@@ -1,10 +1,91 @@
 <div class="row">
   <div class="d-flex justify-content-between mb-2">
     <h2 class="mt-2">Siparişler</h2>
-    <button type="button" class="btn btn-sm btn-primary">
-      <i class="ti ti-basket-plus"></i>   Sipariş Ekle
+    <button type="button" class="btn btn-sm btn-primary" disabled>
+      <i class="ti ti-basket-plus"></i>
+      Sipariş Ekle
     </button>
   </div>
   <hr />
-  <div></div>
+  <div class="d-flex justify-content-between mb-2">
+    <input
+      class="form-control"
+      type="text"
+      placeholder="Sipariş Ara"
+      [(ngModel)]="searchTerm"
+      (input)="searchOrder()"
+      aria-label="Sipariş Ara"
+    />
+  </div>
+  <div>
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th scope="col">Sipariş No</th>
+          <th scope="col">Tarih</th>
+          <th scope="col">Müşteri</th>
+          <th scope="col">Toplam Tutar</th>
+          <th scope="col">Durum</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of filteredOrders">
+          <td>{{ order.orderNumber }}</td>
+          <td>{{ order.orderDate | date: 'dd/MM/yyyy' }}</td>
+          <td>{{ order.customer.firstName }} {{ order.customer.lastName }}</td>
+          <td>{{ order.orderTotalAmount | currency }}</td>
+          <td>{{ order.statusName }}</td>
+          <td class="d-flex justify-content-end">
+            <button type="button" class="btn btn-sm btn-secondary" title="İncele" disabled><i class="ti ti-search"></i></button>
+            <button type="button" class="btn btn-sm btn-warning mx-1" (click)="openUpdateStatusModal(order)" title="Statü Güncelle">
+              <i class="ti ti-truck"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Durum Güncelle Modal -->
+<div class="modal fade" #updateStatusModal tabindex="-1" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="updateStatusModalLabel">Sipariş Durumunu Güncelle</h5>
+        <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedOrder">
+        <form>
+          <div class="mb-3">
+            <label for="orderNumber" class="col-form-label">Sipariş No</label>
+            <input type="text" class="form-control" [(ngModel)]="selectedOrder.orderNumber" name="orderNumber" disabled />
+          </div>
+          <div class="mb-3">
+            <label for="orderNumber" class="col-form-label">Müşteri</label>
+            <input
+              type="text"
+              class="form-control"
+              [value]="selectedOrder?.customer.firstName + ' ' + selectedOrder?.customer.lastName"
+              name="orderNumber"
+              disabled
+            />
+          </div>
+          <div class="mb-3">
+            <label for="status-id" class="col-form-label">Durum</label>
+            <select class="form-control" [(ngModel)]="selectedOrder.statusID" name="statusID">
+              <option *ngFor="let status of orderStatuses" [value]="status.statusID">
+                {{ status.statusName }}
+              </option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-sm btn-outline-danger" (click)="closeModal()">Kapat</button>
+        <button type="button" class="btn btn-sm btn-success" (click)="updateOrderStatus()">Güncelle</button>
+      </div>
+    </div>
+  </div>
 </div>
